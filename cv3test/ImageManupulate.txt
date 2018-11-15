@@ -1,0 +1,107 @@
+Image Manipulations
+
+1. Transformations, affine and non affine
+2. Translations
+T为偏移矩阵
+T = np.float32([[1, 0, quarter_width], [0, 1, quarter_height]])
+cv2.warpAffine(image, T, (width, height))
+3. Rotations
+cv2.getRotationMatrix2D(rotation_center_x, rotation_center_y, angle of rotation, scale)
+
+R为旋转矩阵-旋转中心坐标，旋转角度，缩放比例
+R = cv2.getRotationMatrix2D((width/2, height/2), 90, .5)
+rotated_image = cv2.warpAffine(image, R, (width, height))
+
+逆时针旋转90度，没有黑边
+cv2.transpose(img)
+
+水平翻转
+1-沿Y轴翻转
+0-沿X轴翻转
+flipped = cv2.flip(image, 1)
+4. Scaling, re-sizing and interpolations
+# cv2.resize(image, dsize(output image size), x scale, y scale, interpolation)
+
+将图像缩小到3/4
+image_scaled = cv2.resize(image, None, fx=0.75, fy=0.75)
+将图像放大到2倍
+img_scaled = cv2.resize(image, None, fx=2, fy=2, interpolation = cv2.INTER_CUBIC)
+将图像缩放到精确大小
+img_scaled = cv2.resize(image, (900, 400), interpolation = cv2.INTER_AREA)
+插值算法：
+cv2.INTER_AREA - 适合缩小／下采样cv2.INTER_NEAREST - 更快cv2.INTER_LINEAR - 适合缩放／上采样cv2.INTER_CUBIC - 更好cv2.INTER_LANCZOS4 - 最好的算法
+5. Image Pyramids
+smaller = cv2.pyrDown(image)
+larger = cv2.pyrUp(smaller)
+6. Cropping
+裁剪的起点坐标
+start_row, start_col = int(height * .25), int(width * .25)
+裁剪的终点坐标
+end_row, end_col = int(height * .75), int(width * .75)
+裁剪图片
+cropped = image[start_row:end_row , start_col:end_col]
+7. Arithmetic Operations
+增亮 
+added = cv2.add(image, M)
+变暗
+subtracted = cv2.subtract(image, M)
+8. Bitwise Operations and Masking
+And = cv2.bitwise_and(square, ellipse)
+bitwiseOr = cv2.bitwise_or(square, ellipse)
+bitwiseXor = cv2.bitwise_xor(square, ellipse)
+bitwiseNot_sq = cv2.bitwise_not(square)
+9. Convolutions & Blurring
+
+blurred = cv2.filter2D(image, -1, kernel_3x3)
+blurred2 = cv2.filter2D(image, -1, kernel_7x7)
+
+blur = cv2.blur(image, (3,3))
+
+Gaussian = cv2.GaussianBlur(image, (7,7), 0)
+median = cv2.medianBlur(image, 5)
+bilateral = cv2.bilateralFilter(image, 9, 75, 75)
+
+- cv2.fastNlMeansDenoising() - 适用灰度图像
+- cv2.fastNlMeansDenoisingColored() - 适用彩色图像
+- cv2.fastNlMeansDenoisingMulti() - 适用于短时捕获的灰度图像序列
+- cv2.fastNlMeansDenoisingColoredMulti() - 适用于彩色图像序列
+
+dst = cv2.fastNlMeansDenoisingColored(image, None, 6, 6, 7, 21)
+10. Sharpening
+kernel_sharpening = np.array([[-1,-1,-1], 
+                              [-1,9,-1], 
+                              [-1,-1,-1]])
+sharpened = cv2.filter2D(image, -1, kernel_sharpening)
+11. Thresholding and Binarization
+ret,thresh1 = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
+
+cv2.THRESH_BINARY      127以下为0(黑色)，127以上为255(白色)
+cv2.THRESH_BINARY_INV  127以下为255(白色)，127以上为0(黑色)
+cv2.THRESH_TRUNC       127以上为127
+cv2.THRESH_TOZERO      127以下为255(白色),127以上不变  
+cv2.THRESH_TOZERO_INV  与cv2.THRESH_TOZERO相反
+
+thresh = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
+                               cv2.THRESH_BINARY, 3, 5) 
+cv2.ADAPTIVE_THRESH_MEAN_C : threshold value is the mean of neighbourhood area.
+cv2.ADAPTIVE_THRESH_GAUSSIAN_C : threshold value is the weighted sum of neighbourhood values where weights are a gaussian window.
+12. Dilation, erosion, opening and closing
+erosion = cv2.erode(image, kernel, iterations = 1)
+dilation = cv2.dilate(image, kernel, iterations = 1)
+opening = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
+closing = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel)
+13. Edge Detection & Image Gradients
+sobel_x = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5)
+sobel_y = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=5)
+sobel_OR = cv2.bitwise_or(sobel_x, sobel_y)
+
+laplacian = cv2.Laplacian(image, cv2.CV_64F)
+
+canny = cv2.Canny(image, 50, 120)
+14. Perspective & Affine Transforms
+M = cv2.getPerspectiveTransform(points_A, points_B)
+warped = cv2.warpPerspective(image, M, (Xmax,Ymax))
+M:转换矩阵。
+points_A : 原始图形的顶点坐标
+points_B : 转换过后的顶点坐标
+(Xmax,Ymax):离(0,0)最远的X，Y坐标值

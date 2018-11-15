@@ -1,0 +1,17 @@
+CONTOURS
+
+Step1: cv2.imread
+Step2: cv2.cvtColor->BGR2GRAY
+Step3: cv2.Canny
+Step4: cv2.findContours
+Step5: drawContours
+
+
+Match Shape
+imread
+cvtColor->BGR2GRAY
+threshold
+findContours
+sorted->remove the largest, outside frame
+matchShapes
+drawContours
